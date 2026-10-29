@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido" class="container py-5">
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-lg-4">
+            <div class="panel-ayuda h-100">
+                <i class="bi bi-chat-heart panel-ayuda-icono"></i>
+                <h1 class="h3 fw-bold mt-3" th:text="#{consultas.titulo}">Consultas</h1>
+                <p th:text="#{consultas.subtitulo}">Subtítulo</p>
+                <h2 class="h6 fw-bold text-uppercase mt-4" th:text="#{consultas.ayudaTitulo}">Ayuda</h2>
+                <ul class="lista-patitas mb-0">
+                    <li th:text="#{consultas.ayuda1}">Ayuda</li>
+                    <li th:text="#{consultas.ayuda2}">Ayuda</li>
+                    <li th:text="#{consultas.ayuda3}">Ayuda</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <!-- Mensaje de agradecimiento despues del POST -->
+            <div th:if="${consultaEnviada}" class="alert alerta-gracias d-flex align-items-center gap-3" role="alert">
+                <i class="bi bi-envelope-check fs-3"></i>
+                <span th:text="#{consultas.gracias(${consultaEnviada.nombre}, ${consultaEnviada.nombreMascota})}">Gracias</span>
+            </div>
+
+            <div class="panel">
+                <form th:action="@{/consultas/enviar}" th:object="${consulta}" method="post" class="p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" th:field="*{nombre}"
+                                       th:placeholder="#{consultas.placeholder.nombre}" maxlength="100" required>
+                                <label for="nombre" th:text="#{consultas.campo.nombre}">Nombre</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" th:field="*{correo}"
+                                       th:placeholder="#{consultas.placeholder.correo}" maxlength="100" required>
+                                <label for="correo" th:text="#{consultas.campo.correo}">Correo</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" th:field="*{nombreMascota}"
+                                       th:placeholder="#{consultas.placeholder.mascota}" maxlength="100" required>
+                                <label for="nombreMascota" th:text="#{consultas.campo.mascota}">Mascota</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control area-mensaje" th:field="*{mensaje}"
+                                          th:placeholder="#{consultas.placeholder.mensaje}" maxlength="1000" required></textarea>
+                                <label for="mensaje" th:text="#{consultas.campo.mensaje}">Mensaje</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-bosque rounded-pill px-4">
+                            <i class="bi bi-send me-1"></i><span th:text="#{consultas.enviar}">Enviar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

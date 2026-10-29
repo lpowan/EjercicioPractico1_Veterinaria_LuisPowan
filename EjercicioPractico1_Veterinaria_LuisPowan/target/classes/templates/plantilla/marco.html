@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+    Plantilla base de la aplicacion.
+    Los controladores siempre devuelven esta plantilla y envian en el Model:
+      - vista: ruta de la vista cuyo fragmento "contenido" se muestra en el centro
+      - claveTitulo: clave de messages.properties para el titulo de la pestana
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{${claveTitulo}} + ' | ' + #{app.nombre}">Clínica Veterinaria</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/logo.svg}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <header th:replace="~{componentes/encabezado :: encabezado}"></header>
+
+    <nav th:replace="~{componentes/menu :: menu}"></nav>
+
+    <main class="flex-grow-1">
+        <section th:replace="~{${vista} :: contenido}"></section>
+    </main>
+
+    <footer th:replace="~{componentes/pie :: pie}"></footer>
+
+    <div th:replace="~{componentes/avisos :: avisos}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

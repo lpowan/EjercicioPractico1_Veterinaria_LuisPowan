@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido" class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-7">
+            <a th:href="@{/servicios}" class="enlace-volver">
+                <i class="bi bi-arrow-left me-1"></i><span th:text="#{general.regresar}">Regresar</span>
+            </a>
+            <div class="panel mt-3">
+                <div class="panel-cabecera">
+                    <h1 class="h4 fw-bold mb-0"
+                        th:text="${servicio.id == null} ? #{servicios.form.nuevo} : #{servicios.form.editar}">Formulario</h1>
+                </div>
+                <form th:action="@{/servicios/guardar}" th:object="${servicio}" method="post" class="p-4">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" th:field="*{nombre}"
+                               th:placeholder="#{servicios.placeholder.nombre}" maxlength="100" required>
+                        <label for="nombre" th:text="#{servicios.campo.nombre}">Nombre</label>
+                    </div>
+
+                    <!-- Lista desplegable de tipos de servicio -->
+                    <div class="form-floating mb-3">
+                        <select class="form-select" th:field="*{tipoServicio.id}" required>
+                            <option value="" th:text="#{servicios.seleccione}">Seleccione...</option>
+                            <option th:each="tipo : ${tipos}" th:value="${tipo.id}" th:text="${tipo.nombre}">Tipo</option>
+                        </select>
+                        <label for="tipoServicio.id" th:text="#{servicios.campo.tipo}">Tipo</label>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" th:field="*{precio}"
+                                       placeholder="0" min="0" max="999999.99" step="0.01" required>
+                                <label for="precio" th:text="#{servicios.campo.precio}">Precio</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" th:field="*{duracionMinutos}"
+                                       placeholder="0" min="1" step="1" required>
+                                <label for="duracionMinutos" th:text="#{servicios.campo.duracion}">Duración</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/servicios}" class="btn btn-light rounded-pill px-4" th:text="#{general.cancelar}">Cancelar</a>
+                        <button type="submit" class="btn btn-bosque rounded-pill px-4">
+                            <i class="bi bi-check2 me-1"></i><span th:text="#{general.guardar}">Guardar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido" class="container py-5">
+
+    <div class="encabezado-pagina">
+        <div>
+            <h1 class="titulo-pagina"><i class="bi bi-capsule me-2"></i><span th:text="#{servicios.titulo}">Servicios</span></h1>
+            <p class="text-secondary mb-0" th:text="#{servicios.subtitulo}">Subtítulo</p>
+        </div>
+        <a th:href="@{/servicios/nuevo}" class="btn btn-bosque rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i><span th:text="#{servicios.nuevo}">Nuevo</span>
+        </a>
+    </div>
+
+    <div class="panel">
+        <div class="panel-barra">
+            <span th:text="#{servicios.total(${#lists.size(servicios)})}">Total</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table tabla-clinica align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th th:text="#{servicios.columna.nombre}">Nombre</th>
+                        <th th:text="#{servicios.columna.tipo}">Tipo</th>
+                        <th class="text-end" th:text="#{servicios.columna.precio}">Precio</th>
+                        <th class="text-center" th:text="#{servicios.columna.duracion}">Duración</th>
+                        <th class="text-end" th:text="#{general.acciones}">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="servicio : ${servicios}">
+                        <td class="fw-semibold" th:text="${servicio.nombre}">Nombre</td>
+                        <td><span class="etiqueta-tipo" th:text="${servicio.tipoServicio.nombre}">Tipo</span></td>
+                        <td class="text-end precio" th:text="|₡ ${#numbers.formatDecimal(servicio.precio, 1, 'COMMA', 2, 'POINT')}|">₡ 0.00</td>
+                        <td class="text-center">
+                            <i class="bi bi-hourglass-split text-secondary me-1"></i><span th:text="|${servicio.duracionMinutos} #{servicios.minutos}|">0 min</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a th:href="@{/servicios/editar/{id}(id=${servicio.id})}" class="btn btn-accion"
+                               th:title="#{general.editar}" th:aria-label="#{general.editar}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-accion btn-accion-peligro"
+                                    data-bs-toggle="modal" data-bs-target="#ventanaConfirmacion"
+                                    th:data-id="${servicio.id}" th:data-nombre="${servicio.nombre}"
+                                    th:title="#{general.eliminar}" th:aria-label="#{general.eliminar}">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(servicios)}">
+                        <td colspan="5" class="text-center text-secondary py-5" th:text="#{servicios.vacio}">Vacío</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:replace="~{componentes/confirmacion :: confirmacion(@{/servicios/eliminar})}"></div>
+</section>
+</body>
+</html>

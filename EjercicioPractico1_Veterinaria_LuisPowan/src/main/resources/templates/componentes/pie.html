@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- FOOTER -->
+    <footer th:fragment="pie" class="pie mt-auto">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img th:src="@{/img/logo.svg}" alt="" width="40" height="40">
+                        <span class="fs-5 fw-bold" th:text="#{app.nombre}">Clínica</span>
+                    </div>
+                    <p class="small mb-0 pie-texto" th:text="#{pie.descripcion}">Descripción</p>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <h2 class="pie-titulo" th:text="#{pie.contacto}">Contacto</h2>
+                    <p class="small mb-1"><i class="bi bi-geo-alt me-2"></i><span th:text="#{pie.direccion}">Dirección</span></p>
+                    <p class="small mb-1"><i class="bi bi-telephone me-2"></i><span th:text="#{pie.telefono}">Teléfono</span></p>
+                    <p class="small mb-0"><i class="bi bi-envelope me-2"></i><span th:text="#{pie.correo}">Correo</span></p>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <h2 class="pie-titulo" th:text="#{pie.horario}">Horario</h2>
+                    <p class="small mb-1" th:text="#{pie.horarioSemana}">Semana</p>
+                    <p class="small mb-1" th:text="#{pie.horarioSabado}">Sábado</p>
+                    <p class="small mb-0" th:text="#{pie.horarioEmergencias}">Emergencias</p>
+                </div>
+            </div>
+        </div>
+        <div class="pie-derechos text-center small py-3" th:text="#{pie.derechos}">Derechos</div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+
+    <!-- Portada con la campana destacada del mes -->
+    <div class="portada">
+        <div class="container py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="etiqueta-suave mb-3" th:text="#{app.eslogan}">Eslogan</span>
+                    <h1 class="portada-titulo mt-3" th:text="#{inicio.bienvenida}">Bienvenida</h1>
+                    <p class="lead portada-texto" th:text="#{inicio.introduccion}">Introducción</p>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a th:href="@{/servicios}" class="btn btn-bosque rounded-pill px-4" th:text="#{inicio.verServicios}">Servicios</a>
+                        <a th:href="@{/consultas}" class="btn btn-outline-bosque rounded-pill px-4" th:text="#{inicio.enviarConsulta}">Consulta</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <article class="campana">
+                        <div class="campana-cinta">
+                            <i class="bi bi-stars me-1"></i><span th:text="#{inicio.campanaEtiqueta}">Campaña</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="campana-icono"><i class="bi bi-shield-check"></i></div>
+                                <h2 class="h3 fw-bold mb-0" th:text="#{inicio.campanaTitulo}">Jornada de Vacunación</h2>
+                            </div>
+                            <p th:text="#{inicio.campanaDescripcion}">Descripción</p>
+                            <ul class="lista-patitas">
+                                <li th:text="#{inicio.campanaBeneficio1}">Beneficio</li>
+                                <li th:text="#{inicio.campanaBeneficio2}">Beneficio</li>
+                                <li th:text="#{inicio.campanaBeneficio3}">Beneficio</li>
+                            </ul>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2">
+                                <small class="fw-semibold campana-vigencia">
+                                    <i class="bi bi-calendar-event me-1"></i><span th:text="#{inicio.campanaVigencia}">Vigencia</span>
+                                </small>
+                                <a th:href="@{/consultas}" class="btn btn-ambar btn-sm rounded-pill px-3" th:text="#{inicio.campanaBoton}">Reservar</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+
+        <!-- Informacion de la clinica -->
+        <h2 class="titulo-bloque text-center" th:text="#{inicio.infoTitulo}">Información</h2>
+        <div class="row g-4 mt-1 mb-5">
+            <div class="col-md-4">
+                <div class="bloque-info h-100">
+                    <i class="bi bi-alarm bloque-info-icono"></i>
+                    <h3 class="h5 fw-bold mt-3" th:text="#{inicio.horarioTitulo}">Horario</h3>
+                    <p class="mb-1" th:text="#{inicio.horarioSemana}">Semana</p>
+                    <p class="mb-1" th:text="#{inicio.horarioSabado}">Sábado</p>
+                    <p class="mb-0 fw-semibold texto-ambar" th:text="#{inicio.horarioEmergencias}">Emergencias</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bloque-info h-100">
+                    <i class="bi bi-pin-map bloque-info-icono"></i>
+                    <h3 class="h5 fw-bold mt-3" th:text="#{inicio.ubicacionTitulo}">Ubicación</h3>
+                    <p class="mb-1" th:text="#{inicio.ubicacionDireccion}">Dirección</p>
+                    <p class="mb-0 small text-secondary" th:text="#{inicio.ubicacionParqueo}">Parqueo</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bloque-info h-100">
+                    <i class="bi bi-patch-check bloque-info-icono"></i>
+                    <h3 class="h5 fw-bold mt-3" th:text="#{inicio.especialidadesTitulo}">Especialidades</h3>
+                    <ul class="lista-patitas mb-0">
+                        <li th:text="#{inicio.especialidad1}">Especialidad</li>
+                        <li th:text="#{inicio.especialidad2}">Especialidad</li>
+                        <li th:text="#{inicio.especialidad3}">Especialidad</li>
+                        <li th:text="#{inicio.especialidad4}">Especialidad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video (iframe) y proximas campanas -->
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-7">
+                <h2 class="titulo-bloque" th:text="#{inicio.videoTitulo}">Video</h2>
+                <p class="text-secondary" th:text="#{inicio.videoTexto}">Texto</p>
+                <div class="ratio ratio-16x9 marco-video">
+                    <iframe th:src="#{inicio.videoUrl}" th:title="#{inicio.videoTitulo}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <h2 class="titulo-bloque" th:text="#{inicio.otrasCampanas}">Próximas campañas</h2>
+                <div class="d-flex flex-column gap-3 mt-3">
+                    <div class="campana-mini">
+                        <i class="bi bi-balloon-heart"></i>
+                        <div>
+                            <h3 class="h6 fw-bold mb-1" th:text="#{inicio.campanaCachorro}">Cachorro</h3>
+                            <p class="small mb-0" th:text="#{inicio.campanaCachorroTexto}">Texto</p>
+                        </div>
+                    </div>
+                    <div class="campana-mini">
+                        <i class="bi bi-heart-pulse"></i>
+                        <div>
+                            <h3 class="h6 fw-bold mb-1" th:text="#{inicio.campanaSenior}">Senior</h3>
+                            <p class="small mb-0" th:text="#{inicio.campanaSeniorTexto}">Texto</p>
+                        </div>
+                    </div>
+                    <div class="campana-mini">
+                        <i class="bi bi-droplet-half"></i>
+                        <div>
+                            <h3 class="h6 fw-bold mb-1" th:text="#{inicio.campanaSpa}">Spa</h3>
+                            <p class="small mb-0" th:text="#{inicio.campanaSpaTexto}">Texto</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- NAVBAR: la opcion activa se calcula con la vista enviada por el controlador -->
+    <nav th:fragment="menu" class="navbar navbar-expand-md menu-principal sticky-top">
+        <div class="container">
+            <span class="navbar-brand d-md-none fw-bold" th:text="#{nav.marca}">Marca</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#opcionesMenu"
+                    aria-controls="opcionesMenu" aria-expanded="false" th:aria-label="#{nav.menu}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="opcionesMenu">
+                <ul class="navbar-nav gap-md-2 py-2 py-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}"
+                           th:classappend="${vista == 'vistas/inicio'} ? 'active'">
+                            <i class="bi bi-house-heart me-1"></i><span th:text="#{nav.inicio}">Inicio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/tipos}"
+                           th:classappend="${#strings.startsWith(vista, 'vistas/tipos')} ? 'active'">
+                            <i class="bi bi-bookmark-star me-1"></i><span th:text="#{nav.tipos}">Tipos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/servicios}"
+                           th:classappend="${#strings.startsWith(vista, 'vistas/servicios')} ? 'active'">
+                            <i class="bi bi-capsule me-1"></i><span th:text="#{nav.servicios}">Servicios</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/citas}"
+                           th:classappend="${#strings.startsWith(vista, 'vistas/citas')} ? 'active'">
+                            <i class="bi bi-calendar2-heart me-1"></i><span th:text="#{nav.citas}">Citas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/consultas}"
+                           th:classappend="${#strings.startsWith(vista, 'vistas/consultas')} ? 'active'">
+                            <i class="bi bi-envelope-heart me-1"></i><span th:text="#{nav.consultas}">Consultas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

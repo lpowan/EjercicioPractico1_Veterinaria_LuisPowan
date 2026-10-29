@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido" class="container py-5">
+
+    <div class="encabezado-pagina">
+        <div>
+            <h1 class="titulo-pagina"><i class="bi bi-calendar2-heart me-2"></i><span th:text="#{citas.titulo}">Citas</span></h1>
+            <p class="text-secondary mb-0" th:text="#{citas.subtitulo}">Subtítulo</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-barra">
+            <span th:text="#{citas.total(${#lists.size(citas)})}">Total</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table tabla-clinica align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th th:text="#{citas.columna.fecha}">Fecha</th>
+                        <th th:text="#{citas.columna.mascota}">Mascota</th>
+                        <th th:text="#{citas.columna.propietario}">Propietario</th>
+                        <th th:text="#{citas.columna.servicio}">Servicio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cita : ${citas}">
+                        <td>
+                            <span class="fecha-cita" th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}">01/01/2026</span>
+                        </td>
+                        <td class="fw-semibold"><i class="bi bi-suit-heart-fill texto-ambar me-2"></i><span th:text="${cita.nombreMascota}">Mascota</span></td>
+                        <td th:text="${cita.nombrePropietario}">Propietario</td>
+                        <td><span class="etiqueta-tipo" th:text="${cita.servicio.nombre}">Servicio</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(citas)}">
+                        <td colspan="4" class="text-center text-secondary py-5" th:text="#{citas.vacio}">Vacío</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

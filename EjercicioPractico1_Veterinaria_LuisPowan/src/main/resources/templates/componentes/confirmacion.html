@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- MODAL de confirmacion: recibe la ruta POST; app.js coloca el id y el nombre -->
+    <div th:fragment="confirmacion(rutaEliminar)" class="modal fade" id="ventanaConfirmacion" tabindex="-1"
+         aria-labelledby="ventanaConfirmacionTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 overflow-hidden">
+                <div class="modal-body text-center p-4">
+                    <div class="confirmacion-icono mx-auto mb-3"><i class="bi bi-trash3"></i></div>
+                    <h2 class="h5 fw-bold" id="ventanaConfirmacionTitulo" th:text="#{modal.titulo}">Confirmar</h2>
+                    <p class="mb-1" th:text="#{modal.pregunta}">¿Eliminar?</p>
+                    <p class="fs-5 fw-bold confirmacion-nombre mb-1" id="registroNombre"></p>
+                    <p class="small text-secondary mb-0" th:text="#{modal.advertencia}">Advertencia</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal" th:text="#{general.cancelar}">Cancelar</button>
+                    <form th:action="${rutaEliminar}" method="post">
+                        <input type="hidden" name="id" id="registroId">
+                        <button type="submit" class="btn btn-danger rounded-pill px-4" th:text="#{general.eliminar}">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

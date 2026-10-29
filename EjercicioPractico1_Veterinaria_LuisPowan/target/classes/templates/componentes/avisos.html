@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- TOAST: muestra los mensajes enviados con RedirectAttributes -->
+    <div th:fragment="avisos" class="toast-container position-fixed top-0 end-0 p-3 mt-5">
+        <div th:if="${mensajeExito}" class="toast aviso aviso-exito" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4500">
+            <div class="toast-header">
+                <i class="bi bi-check2-circle me-2"></i>
+                <strong class="me-auto" th:text="#{nav.marca}">Marca</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" th:aria-label="#{general.cerrar}"></button>
+            </div>
+            <div class="toast-body" th:text="#{${mensajeExito}}">Éxito</div>
+        </div>
+        <div th:if="${mensajeError}" class="toast aviso aviso-error" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="6000">
+            <div class="toast-header">
+                <i class="bi bi-x-octagon me-2"></i>
+                <strong class="me-auto" th:text="#{nav.marca}">Marca</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" th:aria-label="#{general.cerrar}"></button>
+            </div>
+            <div class="toast-body" th:text="#{${mensajeError}}">Error</div>
+        </div>
+    </div>
+</body>
+</html>

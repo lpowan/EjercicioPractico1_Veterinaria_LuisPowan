@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- HEADER: franja de contacto + marca de la clinica -->
+    <header th:fragment="encabezado" class="cabecera">
+        <div class="cabecera-franja">
+            <div class="container d-flex flex-wrap justify-content-center justify-content-md-end gap-3 py-1 small">
+                <span><i class="bi bi-telephone me-1"></i><span th:text="#{encabezado.telefono}">Teléfono</span></span>
+                <span><i class="bi bi-clock me-1"></i><span th:text="#{encabezado.horario}">Horario</span></span>
+                <span class="fw-semibold"><i class="bi bi-plus-circle me-1"></i><span th:text="#{encabezado.emergencias}">Emergencias</span></span>
+            </div>
+        </div>
+        <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
+            <a th:href="@{/}" class="cabecera-marca d-flex align-items-center gap-3 text-decoration-none">
+                <img th:src="@{/img/logo.svg}" alt="" width="64" height="64">
+                <span>
+                    <span class="d-block cabecera-nombre" th:text="#{app.nombre}">Clínica Veterinaria</span>
+                    <span class="d-block cabecera-eslogan" th:text="#{app.eslogan}">Eslogan</span>
+                </span>
+            </a>
+            <a th:href="@{/consultas}" class="btn btn-ambar rounded-pill px-4">
+                <i class="bi bi-chat-dots me-1"></i><span th:text="#{nav.consultas}">Consultas</span>
+            </a>
+        </div>
+    </header>
+</body>
+</html>
