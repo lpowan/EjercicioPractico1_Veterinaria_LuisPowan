@@ -1,11 +1,9 @@
 !======================================================================
-! Router0  ->  hostname RouterServidores
+! Router0
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname RouterServidores
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface GigabitEthernet0/0
  ip address 10.10.1.1 255.255.255.248
  no shutdown
@@ -22,7 +20,7 @@ interface GigabitEthernet0/0/0
  ip address 172.16.0.17 255.255.255.252
  no shutdown
  exit
-!--- 3. Enrutamiento estatico (principal + flotante AD 10)
+!--- 2. Enrutamiento estatico (principal + flotante AD 10)
 ip route 192.168.10.0 255.255.255.0 172.16.0.14
 ip route 192.168.20.0 255.255.255.0 172.16.0.14
 ip route 192.168.30.0 255.255.255.0 172.16.0.14

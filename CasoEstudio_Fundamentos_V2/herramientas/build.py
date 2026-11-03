@@ -14,7 +14,7 @@ from lxml import etree
 import ptcodec
 from model import (DEVICES, ENABLE_SECRET, ENABLE_SECRET_HASH, LINE_PASSWORD, LINE_PASSWORD_T7,
                    DNS_SERVER, DNS_RECORDS, SERVERS, SERVER_GW, PCS_DHCP, PCS_STATIC, HSRP_VIP,
-                   NOTE_REPLACE, expand)
+                   expand)
 
 
 # ------------------------------------------------------------------ CLI script
@@ -38,13 +38,12 @@ def has_basic(d):
 def cli_script(d):
     o = []
     sec = iter(range(1, 10))
-    title = f"{d['xml']}  ->  hostname {d['hostname']}"
+    title = d['xml']
     o += ['!' + '=' * 70, f'! {title}', '!' + '=' * 70,
-          'enable', 'configure terminal',
-          f'!--- {next(sec)}. Configuracion basica',
-          f"hostname {d['hostname']}"]
+          'enable', 'configure terminal']
     if has_basic(d):  # banner y contrasenas solo en el switch multicapa
-        o += ['no ip domain-lookup',
+        o += [f'!--- {next(sec)}. Configuracion basica',
+              'no ip domain-lookup',
               f"banner motd #{d['banner']}#",
               f'enable secret {ENABLE_SECRET}',
               'line console 0', f' password {LINE_PASSWORD}', ' login', ' exit',
@@ -131,7 +130,7 @@ def running_config(d, base):
         if l == 'no service password-encryption' and has_basic(d):
             l = 'service password-encryption'
         if l.startswith('hostname '):
-            nh.append(f"hostname {d['hostname']}")
+            nh.append(l)  # el nombre del equipo se deja como venia en el archivo
             if has_basic(d):
                 nh += ['!', f'enable secret 5 {ENABLE_SECRET_HASH}', '!', 'no ip domain-lookup']
             continue
@@ -287,37 +286,6 @@ def fix_services(engines):
             pool.find('DNS_SERVER').text = DNS_SERVER
 
 
-def fix_notes(root):
-    for t in root.iter('TEXT'):
-        if t.text:
-            for old, new in NOTE_REPLACE:
-                if old in t.text:
-                    t.text = t.text.replace(old, new)
-
-
-PDU_TESTS = [  # (origen, destino, ip destino)
-    ('PC3', 'WEB', '10.10.1.5'),
-    ('PC6', 'DNS', '10.10.1.4'),
-    ('PC9', 'DHCP', '10.10.1.3'),
-    ('PC0', 'WEB', '10.10.1.5'),
-    ('PC4', 'PC0', '192.168.1.4'),
-    ('PC1', 'Router1', HSRP_VIP),
-]
-
-
-def add_pdus(root, ids):
-    sc = root.find('SCENARIOSET/SCENARIO')
-    tmpl = sc.findall('PDU')[0]
-    colors = [-16776961, -65536, -16744448, -8388480, -23296, -16711681]
-    for (src, dst, addr), col in zip(PDU_TESTS, colors):
-        new = copy.deepcopy(tmpl)
-        new.find('SOURCE').text = ids[src]
-        new.find('DESTINATION').set('device', ids[dst])
-        new.find('COLOR').text = str(col)
-        new.find('PDU/DSTADDR').text = addr
-        sc.findall('PDU')[-1].addnext(new)
-
-
 def main(src_xml, outdir):
     os.makedirs(os.path.join(outdir, 'configuraciones'), exist_ok=True)
     tree = etree.parse(src_xml)
@@ -332,7 +300,6 @@ def main(src_xml, outdir):
         run = running_config(d, base)
         set_lines(e, 'RUNNINGCONFIG', run)
         set_lines(e, 'STARTUPCONFIG', run)
-        set_text(e, 'SYS_NAME', d['hostname'])
         if d['kind'] == 'router':
             set_text(e, 'CONFIG_REGISTER', '8450')        # 0x2102
             set_text(e, 'NEXT_CONFIG_REGISTER', '8450')
@@ -340,7 +307,7 @@ def main(src_xml, outdir):
         apply_vlans(d, e)
         cli = cli_script(d)
         all_cli.append(cli)
-        fn = f"{idx:02d}_{d['xml'].replace(' ', '')}_{d['hostname']}"
+        fn = f"{idx:02d}_{d['xml'].replace(' ', '')}"
         open(os.path.join(outdir, 'configuraciones', fn + '.txt'), 'w').write(cli)
         os.makedirs(os.path.join(outdir, 'configuraciones', 'show-run'), exist_ok=True)
         open(os.path.join(outdir, 'configuraciones', 'show-run', fn + '.cfg'), 'w').write('\n'.join(run) + '\n')
@@ -352,14 +319,12 @@ def main(src_xml, outdir):
     for pc, ip in PCS_STATIC:
         set_host_ip(engines[pc], ip, '255.255.255.248', HSRP_VIP, DNS_SERVER)
     fix_services(engines)
-    fix_notes(root)
-    add_pdus(root, ids)
 
     xml_out = etree.tostring(root, encoding='utf-8')
     # Conservar la cabecera tal cual (el original no trae declaracion XML)
     open(os.path.join(outdir, 'resuelto.xml'), 'wb').write(xml_out)
     pkt = ptcodec.encode(xml_out)
-    open(os.path.join(outdir, 'Caso_de_Estudio-Fundamentos_V2_RESUELTO.pkt'), 'wb').write(pkt)
+    open(os.path.join(outdir, 'Caso_de_Estudio-Fundamentos_V2.pkt'), 'wb').write(pkt)
     open(os.path.join(outdir, 'configuraciones', '00_TODOS_LOS_EQUIPOS.txt'), 'w').write('\n\n'.join(all_cli))
     print('ok', len(xml_out), len(pkt))
 

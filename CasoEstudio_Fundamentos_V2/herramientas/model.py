@@ -52,7 +52,7 @@ INTRANET = [
 # --------------------------------------------------------------------------
 DEVICES = [
     dict(
-        xml='Router0', label='Router 0', hostname='RouterServidores', kind='router',
+        xml='Router0', label='Router 0', kind='router',
         banner='Estas conectandote al Router de la red de servidores',
         blocks=[
             (['GigabitEthernet0/0'], [f'ip address 10.10.1.1 {M29}', 'no shutdown']),
@@ -64,7 +64,7 @@ DEVICES = [
         + _routes(LANS_VLAN, '172.16.0.18', 10) + _routes([HSRP_NET], '172.16.0.9', 10),
     ),
     dict(
-        xml='Router1', label='Router 1', hostname='RouterRedundancia2', kind='router',
+        xml='Router1', label='Router 1', kind='router',
         banner='Estas conectandote al Router de redundancia 2',
         blocks=[
             (['GigabitEthernet0/0'], [f'ip address 192.168.1.2 {M29}',
@@ -78,7 +78,7 @@ DEVICES = [
         + _routes(LANS_VLAN, '172.16.0.17', 10) + _routes([SRV], '172.16.0.5', 10),
     ),
     dict(
-        xml='Router2', label='Router 2', hostname='RouterRedundancia1', kind='router',
+        xml='Router2', label='Router 2', kind='router',
         banner='Estas conectandote al Router de redundancia 1',
         blocks=[
             (['GigabitEthernet0/0'], [f'ip address 192.168.1.3 {M29}',
@@ -90,7 +90,7 @@ DEVICES = [
         routes=_routes([SRV] + LANS_VLAN, '172.16.0.10') + _routes([SRV] + LANS_VLAN, '172.16.0.6', 10),
     ),
     dict(
-        xml='Multilayer Switch0', label='Multicapa', hostname='SwitchMulticapaDistribucion', kind='mls',
+        xml='Multilayer Switch0', label='Multicapa', kind='mls',
         banner='Estas conectandote al Switch multicapa de distribucion',
         vlans=VLANS,
         blocks=[
@@ -114,7 +114,7 @@ DEVICES = [
         + _routes([SRV], '172.16.0.1', 10) + _routes([HSRP_NET], '172.16.0.13', 10),
     ),
     dict(
-        xml='Switch1', label='Switch 1', hostname='Clientes', kind='l2',
+        xml='Switch1', label='Switch 1', kind='l2',
         banner='Estas conectandote al Switch de Clientes',
         vlans=VLANS,
         blocks=[
@@ -126,7 +126,7 @@ DEVICES = [
         portchannels=[(1, ['switchport mode trunk', f'switchport trunk allowed vlan {TRUNK_VLANS}'])],
     ),
     dict(
-        xml='Switch2', label='Switch 2', hostname='Administrativo', kind='l2',
+        xml='Switch2', label='Switch 2', kind='l2',
         banner='Estas conectandote al Switch de administracion',
         vlans=VLANS,
         blocks=[
@@ -143,7 +143,7 @@ DEVICES = [
                       (2, ['switchport mode trunk', f'switchport trunk allowed vlan {TRUNK_VLANS}'])],
     ),
     dict(
-        xml='Switch3', label='Switch 3', hostname='Finanzas', kind='l2',
+        xml='Switch3', label='Switch 3', kind='l2',
         banner='Estas conectandote al Switch de Finanzas',
         vlans=VLANS,
         blocks=[
@@ -155,14 +155,14 @@ DEVICES = [
         portchannels=[(2, ['switchport mode trunk', f'switchport trunk allowed vlan {TRUNK_VLANS}'])],
     ),
     dict(
-        xml='Switch0', label='Switch 0', hostname='Red-servidores', kind='l2',
+        xml='Switch0', label='Switch 0', kind='l2',
         banner='Estas conectandote al Switch de la red de servidores',
         blocks=[
             (['FastEthernet0/1-10'], ['switchport mode access', 'spanning-tree portfast', 'no shutdown']),
         ],
     ),
     dict(
-        xml='Switch4', label='Switch 4', hostname='Red-TI', kind='l2',
+        xml='Switch4', label='Switch 4', kind='l2',
         banner='Estas conectandote al Switch de la red de TI',
         blocks=[
             (['FastEthernet0/1-10'], ['switchport mode access', 'spanning-tree portfast', 'no shutdown']),
@@ -176,10 +176,6 @@ SERVER_GW = '10.10.1.1'
 DNS_RECORDS = {'www.web.com': WEB_SERVER, 'www.micorreo.com': '10.10.1.6'}
 PCS_DHCP = ['PC%d' % i for i in range(3, 12)]                     # VLAN 10/20/30 -> DHCP
 PCS_STATIC = [('PC0', '192.168.1.4'), ('PC1', '192.168.1.5'), ('PC2', '192.168.1.6')]  # red HSRP/TI
-
-# Notas del diagrama que se actualizan al direccionamiento implementado
-NOTE_REPLACE = [('RED - Servidores - 10.10.10.0/29', 'RED - Servidores - 10.10.1.0/29'),
-                ('RED - TI 172.16.99.0/24', 'RED - TI (HSRP) 192.168.1.0/29')]
 
 
 def expand(spec):

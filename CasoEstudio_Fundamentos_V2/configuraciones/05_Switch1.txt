@@ -1,11 +1,9 @@
 !======================================================================
-! Switch3  ->  hostname Finanzas
+! Switch1
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Finanzas
-!--- 2. VLANs
+!--- 1. VLANs
 vlan 10
  name Clientes
  exit
@@ -15,20 +13,20 @@ vlan 20
 vlan 30
  name Finanzas
  exit
-!--- 3. Interfaces
-interface range FastEthernet0/10 - 20
+!--- 2. Interfaces
+interface range FastEthernet0/1 - 10
  switchport mode access
- switchport access vlan 30
+ switchport access vlan 10
  spanning-tree portfast
  no shutdown
  exit
-interface range FastEthernet0/1 - 2
+interface range FastEthernet0/21 - 22
  switchport mode trunk
  switchport trunk allowed vlan 10,20,30
- channel-group 2 mode active
+ channel-group 1 mode active
  no shutdown
  exit
-interface port-channel 2
+interface port-channel 1
  switchport mode trunk
  switchport trunk allowed vlan 10,20,30
  exit

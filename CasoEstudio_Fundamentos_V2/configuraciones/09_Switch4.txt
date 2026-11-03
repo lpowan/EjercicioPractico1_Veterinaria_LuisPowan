@@ -1,11 +1,9 @@
 !======================================================================
-! Switch4  ->  hostname Red-TI
+! Switch4
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Red-TI
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface range FastEthernet0/1 - 10
  switchport mode access
  spanning-tree portfast

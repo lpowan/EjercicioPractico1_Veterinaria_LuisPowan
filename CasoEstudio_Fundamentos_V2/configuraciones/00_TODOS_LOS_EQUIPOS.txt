@@ -1,11 +1,9 @@
 !======================================================================
-! Router0  ->  hostname RouterServidores
+! Router0
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname RouterServidores
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface GigabitEthernet0/0
  ip address 10.10.1.1 255.255.255.248
  no shutdown
@@ -22,7 +20,7 @@ interface GigabitEthernet0/0/0
  ip address 172.16.0.17 255.255.255.252
  no shutdown
  exit
-!--- 3. Enrutamiento estatico (principal + flotante AD 10)
+!--- 2. Enrutamiento estatico (principal + flotante AD 10)
 ip route 192.168.10.0 255.255.255.0 172.16.0.14
 ip route 192.168.20.0 255.255.255.0 172.16.0.14
 ip route 192.168.30.0 255.255.255.0 172.16.0.14
@@ -38,13 +36,11 @@ write memory
 
 
 !======================================================================
-! Router1  ->  hostname RouterRedundancia2
+! Router1
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname RouterRedundancia2
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface GigabitEthernet0/0
  ip address 192.168.1.2 255.255.255.248
  standby version 2
@@ -65,7 +61,7 @@ interface GigabitEthernet0/0/0
  ip address 172.16.0.18 255.255.255.252
  no shutdown
  exit
-!--- 3. Enrutamiento estatico (principal + flotante AD 10)
+!--- 2. Enrutamiento estatico (principal + flotante AD 10)
 ip route 192.168.10.0 255.255.255.0 172.16.0.2
 ip route 192.168.20.0 255.255.255.0 172.16.0.2
 ip route 192.168.30.0 255.255.255.0 172.16.0.2
@@ -81,13 +77,11 @@ write memory
 
 
 !======================================================================
-! Router2  ->  hostname RouterRedundancia1
+! Router2
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname RouterRedundancia1
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface GigabitEthernet0/0
  ip address 192.168.1.3 255.255.255.248
  standby version 2
@@ -104,7 +98,7 @@ interface GigabitEthernet0/2
  ip address 172.16.0.9 255.255.255.252
  no shutdown
  exit
-!--- 3. Enrutamiento estatico (principal + flotante AD 10)
+!--- 2. Enrutamiento estatico (principal + flotante AD 10)
 ip route 10.10.1.0 255.255.255.248 172.16.0.10
 ip route 192.168.10.0 255.255.255.0 172.16.0.10
 ip route 192.168.20.0 255.255.255.0 172.16.0.10
@@ -120,12 +114,11 @@ write memory
 
 
 !======================================================================
-! Multilayer Switch0  ->  hostname SwitchMulticapaDistribucion
+! Multilayer Switch0
 !======================================================================
 enable
 configure terminal
 !--- 1. Configuracion basica
-hostname SwitchMulticapaDistribucion
 no ip domain-lookup
 banner motd #Estas conectandote al Switch multicapa de distribucion#
 enable secret CLASS
@@ -197,13 +190,11 @@ write memory
 
 
 !======================================================================
-! Switch1  ->  hostname Clientes
+! Switch1
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Clientes
-!--- 2. VLANs
+!--- 1. VLANs
 vlan 10
  name Clientes
  exit
@@ -213,7 +204,7 @@ vlan 20
 vlan 30
  name Finanzas
  exit
-!--- 3. Interfaces
+!--- 2. Interfaces
 interface range FastEthernet0/1 - 10
  switchport mode access
  switchport access vlan 10
@@ -235,13 +226,11 @@ write memory
 
 
 !======================================================================
-! Switch2  ->  hostname Administrativo
+! Switch2
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Administrativo
-!--- 2. VLANs
+!--- 1. VLANs
 vlan 10
  name Clientes
  exit
@@ -251,7 +240,7 @@ vlan 20
 vlan 30
  name Finanzas
  exit
-!--- 3. Interfaces
+!--- 2. Interfaces
 interface range FastEthernet0/10 - 20
  switchport mode access
  switchport access vlan 20
@@ -288,13 +277,11 @@ write memory
 
 
 !======================================================================
-! Switch3  ->  hostname Finanzas
+! Switch3
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Finanzas
-!--- 2. VLANs
+!--- 1. VLANs
 vlan 10
  name Clientes
  exit
@@ -304,7 +291,7 @@ vlan 20
 vlan 30
  name Finanzas
  exit
-!--- 3. Interfaces
+!--- 2. Interfaces
 interface range FastEthernet0/10 - 20
  switchport mode access
  switchport access vlan 30
@@ -326,13 +313,11 @@ write memory
 
 
 !======================================================================
-! Switch0  ->  hostname Red-servidores
+! Switch0
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Red-servidores
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface range FastEthernet0/1 - 10
  switchport mode access
  spanning-tree portfast
@@ -343,13 +328,11 @@ write memory
 
 
 !======================================================================
-! Switch4  ->  hostname Red-TI
+! Switch4
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica
-hostname Red-TI
-!--- 2. Interfaces
+!--- 1. Interfaces
 interface range FastEthernet0/1 - 10
  switchport mode access
  spanning-tree portfast

@@ -1,10 +1,9 @@
 !======================================================================
-! Multilayer Switch0  ->  hostname SwitchMulticapaDistribucion
+! Multilayer Switch0
 !======================================================================
 enable
 configure terminal
 !--- 1. Configuracion basica
-hostname SwitchMulticapaDistribucion
 no ip domain-lookup
 banner motd #Estas conectandote al Switch multicapa de distribucion#
 enable secret CLASS
