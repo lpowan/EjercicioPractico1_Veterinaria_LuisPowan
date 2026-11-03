@@ -3,48 +3,38 @@
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica y seguridad
+!--- 1. Configuracion basica
 hostname RouterRedundancia2
 no ip domain-lookup
-ip domain-name casoestudio.local
-enable secret CLASS
-service password-encryption
 banner motd #Estas conectandote al Router de redundancia 2#
-username admin secret CISCO
+enable secret CLASS
 line console 0
  password CISCO
  login
  exit
 line vty 0 15
  password CISCO
- login local
- transport input ssh
+ login
  exit
-crypto key generate rsa general-keys modulus 1024
-ip ssh version 2
+service password-encryption
 !--- 2. Interfaces
 interface GigabitEthernet0/0
- description LAN TI 172.16.99.0/24 - HSRP activo
- ip address 172.16.99.2 255.255.255.0
- ip helper-address 10.10.10.3
+ ip address 192.168.1.2 255.255.255.248
  standby version 2
- standby 1 ip 172.16.99.1
+ standby 1 ip 192.168.1.1
  standby 1 priority 200
  standby 1 preempt
  no shutdown
  exit
 interface GigabitEthernet0/1
- description Enlace II hacia RouterRedundancia1
  ip address 172.16.0.6 255.255.255.252
  no shutdown
  exit
 interface GigabitEthernet0/2
- description Enlace I hacia SwitchMulticapaDistribucion
  ip address 172.16.0.1 255.255.255.252
  no shutdown
  exit
 interface GigabitEthernet0/0/0
- description Enlace V (fibra) hacia RouterServidores
  ip address 172.16.0.18 255.255.255.252
  no shutdown
  exit
@@ -52,11 +42,11 @@ interface GigabitEthernet0/0/0
 ip route 192.168.10.0 255.255.255.0 172.16.0.2
 ip route 192.168.20.0 255.255.255.0 172.16.0.2
 ip route 192.168.30.0 255.255.255.0 172.16.0.2
-ip route 10.10.10.0 255.255.255.248 172.16.0.17
+ip route 10.10.1.0 255.255.255.248 172.16.0.17
 ip route 192.168.10.0 255.255.255.0 172.16.0.17 10
 ip route 192.168.20.0 255.255.255.0 172.16.0.17 10
 ip route 192.168.30.0 255.255.255.0 172.16.0.17 10
-ip route 10.10.10.0 255.255.255.248 172.16.0.5 10
+ip route 10.10.1.0 255.255.255.248 172.16.0.5 10
 !--- El registro estaba en 0x2142 (ignora la NVRAM al reiniciar). Se restablece:
 config-register 0x2102
 end

@@ -3,25 +3,20 @@
 !======================================================================
 enable
 configure terminal
-!--- 1. Configuracion basica y seguridad
+!--- 1. Configuracion basica
 hostname Finanzas
 no ip domain-lookup
-ip domain-name casoestudio.local
-enable secret CLASS
-service password-encryption
 banner motd #Estas conectandote al Switch de Finanzas#
-username admin secret CISCO
+enable secret CLASS
 line console 0
  password CISCO
  login
  exit
 line vty 0 15
  password CISCO
- login local
- transport input ssh
+ login
  exit
-crypto key generate rsa general-keys modulus 1024
-ip ssh version 2
+service password-encryption
 !--- 2. VLANs
 vlan 10
  name Clientes
@@ -34,31 +29,20 @@ vlan 30
  exit
 !--- 3. Interfaces
 interface range FastEthernet0/10 - 20
- description Puertos VLAN 30 Finanzas
  switchport mode access
  switchport access vlan 30
  spanning-tree portfast
  no shutdown
  exit
 interface range FastEthernet0/1 - 2
- description EtherChannel Po2 hacia Administrativo
  switchport mode trunk
  switchport trunk allowed vlan 10,20,30
  channel-group 2 mode active
  no shutdown
  exit
-interface range FastEthernet0/3 - 9, FastEthernet0/21 - 24, GigabitEthernet0/1 - 2
- shutdown
- exit
 interface port-channel 2
- description EtherChannel LACP hacia Administrativo
  switchport mode trunk
  switchport trunk allowed vlan 10,20,30
  exit
-interface vlan 30
- ip address 192.168.30.254 255.255.255.0
- no shutdown
- exit
-ip default-gateway 192.168.30.1
 end
 write memory

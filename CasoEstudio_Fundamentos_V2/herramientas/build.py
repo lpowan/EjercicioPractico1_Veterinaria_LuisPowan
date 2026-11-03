@@ -12,9 +12,9 @@ import sys
 from lxml import etree
 
 import ptcodec
-from model import (DEVICES, DOMAIN, ENABLE_SECRET, ENABLE_SECRET_HASH, LINE_PASSWORD,
-                   LINE_PASSWORD_T7, SSH_PASS, SSH_USER, USER_SECRET_HASH, VLANS, TI_POOL,
-                   PCS_DHCP, expand, short)
+from model import (DEVICES, ENABLE_SECRET, ENABLE_SECRET_HASH, LINE_PASSWORD, LINE_PASSWORD_T7,
+                   DNS_SERVER, DNS_RECORDS, SERVERS, SERVER_GW, PCS_DHCP, PCS_STATIC, HSRP_VIP,
+                   NOTE_REPLACE, expand)
 
 
 # ------------------------------------------------------------------ CLI script
@@ -36,18 +36,14 @@ def cli_script(d):
     title = f"{d['xml']}  ->  hostname {d['hostname']}"
     o += ['!' + '=' * 70, f'! {title}', '!' + '=' * 70,
           'enable', 'configure terminal',
-          f'!--- {next(sec)}. Configuracion basica y seguridad',
+          f'!--- {next(sec)}. Configuracion basica',
           f"hostname {d['hostname']}",
           'no ip domain-lookup',
-          f'ip domain-name {DOMAIN}',
-          f'enable secret {ENABLE_SECRET}',
-          'service password-encryption',
           f"banner motd #{d['banner']}#",
-          f'username {SSH_USER} secret {SSH_PASS}',
+          f'enable secret {ENABLE_SECRET}',
           'line console 0', f' password {LINE_PASSWORD}', ' login', ' exit',
-          'line vty 0 15', f' password {LINE_PASSWORD}', ' login local', ' transport input ssh', ' exit',
-          'crypto key generate rsa general-keys modulus 1024',
-          'ip ssh version 2']
+          'line vty 0 15', f' password {LINE_PASSWORD}', ' login', ' exit',
+          'service password-encryption']
     if d.get('vlans'):
         o.append(f'!--- {next(sec)}. VLANs')
         for vid, name in d['vlans']:
@@ -63,7 +59,10 @@ def cli_script(d):
         o.append(f'interface port-channel {num}')
         o += [' ' + c for c in cmds] + [' exit']
     for vid, ipaddr, mask, extra in d.get('svis', []):
-        o += [f'interface vlan {vid}', f' ip address {ipaddr} {mask}'] + [' ' + c for c in extra] + [' no shutdown', ' exit']
+        desc = [c for c in extra if c.startswith('description')]
+        rest = [c for c in extra if not c.startswith('description')]
+        o += [f'interface vlan {vid}'] + [' ' + c for c in desc] + [f' ip address {ipaddr} {mask}'] \
+            + [' ' + c for c in rest] + [' no shutdown', ' exit']
     if d.get('gateway'):
         o.append(f"ip default-gateway {d['gateway']}")
     if d.get('routes'):
@@ -127,8 +126,7 @@ def running_config(d, base):
             l = 'service password-encryption'
         if l.startswith('hostname '):
             nh += [f"hostname {d['hostname']}", '!', f'enable secret 5 {ENABLE_SECRET_HASH}', '!',
-                   f'username {SSH_USER} secret 5 {USER_SECRET_HASH}', '!',
-                   'no ip domain-lookup', f'ip domain-name {DOMAIN}']
+                   'no ip domain-lookup']
             continue
         nh.append(l)
     # ---- interfaces
@@ -156,7 +154,8 @@ def running_config(d, base):
         out_if.append([name, allc])
     for vid, a, m, extra in d.get('svis', []):
         if vid != 1:
-            out_if.append([f'Vlan{vid}', [f'ip address {a} {m}'] + extra])
+            desc = [c for c in extra if c.startswith('description')]
+            out_if.append([f'Vlan{vid}', desc + [f'ip address {a} {m}'] + [c for c in extra if c not in desc]])
     body = []
     for name, sub in out_if:
         body.append(f'interface {name}')
@@ -177,12 +176,12 @@ def running_config(d, base):
         if l.startswith('line con 0'):
             if d.get('gateway'):
                 nt += [f"ip default-gateway {d['gateway']}", '!']
-            nt += ['ip ssh version 2', '!', f"banner motd '{d['banner']}'", '!', '!']
+            nt += [f"banner motd '{d['banner']}'", '!', '!']
             nt += ['line con 0', f' password 7 {LINE_PASSWORD_T7}', ' login', '!']
             if has_aux:
                 nt += ['line aux 0', '!']
             for r in ('0 4', '5 15'):
-                nt += [f'line vty {r}', f' password 7 {LINE_PASSWORD_T7}', ' login local', ' transport input ssh']
+                nt += [f'line vty {r}', f' password 7 {LINE_PASSWORD_T7}', ' login']
             nt += ['!', '!', '!', 'end']
             break
         nt.append(l)
@@ -257,38 +256,52 @@ def apply_vlans(d, engine):
             existing[vid] = new
 
 
-def add_ti_pool(server_engine):
-    pools = server_engine.find('DHCP_SERVERS/ASSOCIATED_PORTS/ASSOCIATED_PORT/DHCP_SERVER/POOLS')
-    for p in pools.findall('POOL'):
-        if p.findtext('NAME') == TI_POOL['name']:
-            return
-    tmpl = [p for p in pools.findall('POOL') if p.findtext('NAME') == 'VLAN 10'][0]
-    new = copy.deepcopy(tmpl)
-    new.find('NAME').text = TI_POOL['name']
-    new.find('NETWORK').text = TI_POOL['network']
-    new.find('MASK').text = TI_POOL['mask']
-    new.find('DEFAULT_ROUTER').text = TI_POOL['gw']
-    new.find('START_IP').text = TI_POOL['start']
-    s = TI_POOL['start'].split('.')
-    new.find('END_IP').text = '.'.join(s[:3] + [str(int(s[3]) + TI_POOL['max_users'] - 1)])
-    new.find('DNS_SERVER').text = TI_POOL['dns']
-    new.find('MAX_USERS').text = str(TI_POOL['max_users'])
-    pools[-1].addnext(new)
+def set_host_ip(engine, ip, mask, gw, dns, dhcp=False):
+    port = next(engine.find('MODULE').iter('PORT'))
+    port.find('PORT_DHCP_ENABLE').text = 'true' if dhcp else 'false'
+    if dhcp:
+        return
+    port.find('IP').text = ip
+    port.find('SUBNET').text = mask
+    port.find('PORT_GATEWAY').text = gw
+    engine.find('GATEWAY').text = gw
+    engine.find('DNS_CLIENT/SERVER_IP').text = dns
+
+
+def fix_services(engines):
+    # Registros DNS -> nueva red de servidores
+    for rr in engines['DNS'].iter('RESOURCE-RECORD'):
+        name = rr.findtext('NAME')
+        if name in DNS_RECORDS:
+            rr.find('IPADDRESS').text = DNS_RECORDS[name]
+    # Pools DHCP de las VLAN: servidor DNS nuevo
+    for pool in engines['DHCP'].iter('POOL'):
+        if pool.findtext('NAME', '').startswith('VLAN'):
+            pool.find('DNS_SERVER').text = DNS_SERVER
+
+
+def fix_notes(root):
+    for t in root.iter('TEXT'):
+        if t.text:
+            for old, new in NOTE_REPLACE:
+                if old in t.text:
+                    t.text = t.text.replace(old, new)
 
 
 PDU_TESTS = [  # (origen, destino, ip destino)
-    ('PC3', 'WEB', '10.10.10.5'),
-    ('PC6', 'DNS', '10.10.10.4'),
-    ('PC9', 'DHCP', '10.10.10.3'),
-    ('PC0', 'WEB', '10.10.10.5'),
-    ('PC4', 'Router1', '172.16.99.1'),
+    ('PC3', 'WEB', '10.10.1.5'),
+    ('PC6', 'DNS', '10.10.1.4'),
+    ('PC9', 'DHCP', '10.10.1.3'),
+    ('PC0', 'WEB', '10.10.1.5'),
+    ('PC4', 'PC0', '192.168.1.4'),
+    ('PC1', 'Router1', HSRP_VIP),
 ]
 
 
 def add_pdus(root, ids):
     sc = root.find('SCENARIOSET/SCENARIO')
     tmpl = sc.findall('PDU')[0]
-    colors = [-16776961, -65536, -16744448, -8388480, -23296]
+    colors = [-16776961, -65536, -16744448, -8388480, -23296, -16711681]
     for (src, dst, addr), col in zip(PDU_TESTS, colors):
         new = copy.deepcopy(tmpl)
         new.find('SOURCE').text = ids[src]
@@ -325,10 +338,14 @@ def main(src_xml, outdir):
         os.makedirs(os.path.join(outdir, 'configuraciones', 'show-run'), exist_ok=True)
         open(os.path.join(outdir, 'configuraciones', 'show-run', fn + '.cfg'), 'w').write('\n'.join(run) + '\n')
 
-    add_ti_pool(engines['DHCP'])
+    for name, ip in SERVERS:
+        set_host_ip(engines[name], ip, '255.255.255.248', SERVER_GW, DNS_SERVER)
     for pc in PCS_DHCP:
-        port = next(engines[pc].find('MODULE').iter('PORT'))
-        port.find('PORT_DHCP_ENABLE').text = 'true'
+        set_host_ip(engines[pc], None, None, None, None, dhcp=True)
+    for pc, ip in PCS_STATIC:
+        set_host_ip(engines[pc], ip, '255.255.255.248', HSRP_VIP, DNS_SERVER)
+    fix_services(engines)
+    fix_notes(root)
     add_pdus(root, ids)
 
     xml_out = etree.tostring(root, encoding='utf-8')

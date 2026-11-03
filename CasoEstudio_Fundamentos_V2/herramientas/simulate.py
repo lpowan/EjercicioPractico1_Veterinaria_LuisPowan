@@ -26,8 +26,8 @@ LINKS = {  # nombre enlace -> extremos (dispositivo, interfaz)
     'V': [('Router0', 'GigabitEthernet0/0/0'), ('Router1', 'GigabitEthernet0/0/0')],
 }
 LANS = {
-    'Servidores': ('10.10.10.5', ['Router0']),
-    'TI': ('172.16.99.10', ['Router1', 'Router2']),
+    'Servidores': ('10.10.1.5', ['Router0']),
+    'TI': ('192.168.1.4', ['Router1', 'Router2']),
     'VLAN10': ('192.168.10.2', ['Multilayer Switch0']),
     'VLAN20': ('192.168.20.2', ['Multilayer Switch0']),
     'VLAN30': ('192.168.30.2', ['Multilayer Switch0']),
