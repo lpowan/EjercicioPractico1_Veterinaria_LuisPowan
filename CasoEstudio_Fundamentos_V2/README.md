@@ -43,8 +43,13 @@
 
 ## Qué quedó configurado
 
-- **Básico (todos los routers y switches):** hostname, banner MOTD, consola y VTY con contraseña `CISCO`, `enable secret CLASS` y `service password-encryption`.
-- **Descripciones:** solo en el switch multicapa (troncal Fa0/24, enlaces G0/1 y G0/2, SVI de las VLAN).
+- **Hostname:** en todos los routers y switches.
+- **Solo en el switch multicapa:**
+  - Banner MOTD.
+  - Contraseña `CISCO` en consola y VTY.
+  - `enable secret CLASS` y `service password-encryption`.
+  - Descripciones de interfaz (troncal Fa0/24, enlaces G0/1 y G0/2, SVI de las VLAN).
+  - El resto de los equipos no tiene banner ni contraseñas.
 - **Nivel de acceso:**
   - VLAN 10, 20 y 30 en los Switches 1, 2 y 3. Los puertos de acceso son Fa0/1-10 en el Switch 1 y Fa0/10-20 en los Switches 2 y 3.
   - EtherChannel LACP: Po1 entre Switch1 y Switch2 (Fa0/21-22) y Po2 entre Switch2 y Switch3 (Fa0/1-2), ambos troncales.

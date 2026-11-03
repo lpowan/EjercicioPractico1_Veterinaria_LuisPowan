@@ -5,18 +5,6 @@ enable
 configure terminal
 !--- 1. Configuracion basica
 hostname RouterRedundancia1
-no ip domain-lookup
-banner motd #Estas conectandote al Router de redundancia 1#
-enable secret CLASS
-line console 0
- password CISCO
- login
- exit
-line vty 0 15
- password CISCO
- login
- exit
-service password-encryption
 !--- 2. Interfaces
 interface GigabitEthernet0/0
  ip address 192.168.1.3 255.255.255.248

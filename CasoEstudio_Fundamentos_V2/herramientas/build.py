@@ -30,6 +30,11 @@ def range_cli(specs):
     return ', '.join(parts)
 
 
+def has_basic(d):
+    """Banner, contrasenas y cifrado: solo en el switch multicapa."""
+    return d['kind'] == 'mls'
+
+
 def cli_script(d):
     o = []
     sec = iter(range(1, 10))
@@ -37,13 +42,14 @@ def cli_script(d):
     o += ['!' + '=' * 70, f'! {title}', '!' + '=' * 70,
           'enable', 'configure terminal',
           f'!--- {next(sec)}. Configuracion basica',
-          f"hostname {d['hostname']}",
-          'no ip domain-lookup',
-          f"banner motd #{d['banner']}#",
-          f'enable secret {ENABLE_SECRET}',
-          'line console 0', f' password {LINE_PASSWORD}', ' login', ' exit',
-          'line vty 0 15', f' password {LINE_PASSWORD}', ' login', ' exit',
-          'service password-encryption']
+          f"hostname {d['hostname']}"]
+    if has_basic(d):  # banner y contrasenas solo en el switch multicapa
+        o += ['no ip domain-lookup',
+              f"banner motd #{d['banner']}#",
+              f'enable secret {ENABLE_SECRET}',
+              'line console 0', f' password {LINE_PASSWORD}', ' login', ' exit',
+              'line vty 0 15', f' password {LINE_PASSWORD}', ' login', ' exit',
+              'service password-encryption']
     if d.get('vlans'):
         o.append(f'!--- {next(sec)}. VLANs')
         for vid, name in d['vlans']:
@@ -122,11 +128,12 @@ def running_config(d, base):
     # ---- head
     nh = []
     for l in head:
-        if l == 'no service password-encryption':
+        if l == 'no service password-encryption' and has_basic(d):
             l = 'service password-encryption'
         if l.startswith('hostname '):
-            nh += [f"hostname {d['hostname']}", '!', f'enable secret 5 {ENABLE_SECRET_HASH}', '!',
-                   'no ip domain-lookup']
+            nh.append(f"hostname {d['hostname']}")
+            if has_basic(d):
+                nh += ['!', f'enable secret 5 {ENABLE_SECRET_HASH}', '!', 'no ip domain-lookup']
             continue
         nh.append(l)
     # ---- interfaces
@@ -173,7 +180,7 @@ def running_config(d, base):
                 nt.append(f'ip route {net} {mask} {nhop}' + (f' {ad}' if ad else ''))
             i += 1
             continue
-        if l.startswith('line con 0'):
+        if l.startswith('line con 0') and has_basic(d):
             if d.get('gateway'):
                 nt += [f"ip default-gateway {d['gateway']}", '!']
             nt += [f"banner motd '{d['banner']}'", '!', '!']

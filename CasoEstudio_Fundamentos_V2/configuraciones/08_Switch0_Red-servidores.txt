@@ -5,18 +5,6 @@ enable
 configure terminal
 !--- 1. Configuracion basica
 hostname Red-servidores
-no ip domain-lookup
-banner motd #Estas conectandote al Switch de la red de servidores#
-enable secret CLASS
-line console 0
- password CISCO
- login
- exit
-line vty 0 15
- password CISCO
- login
- exit
-service password-encryption
 !--- 2. Interfaces
 interface range FastEthernet0/1 - 10
  switchport mode access
