@@ -1,0 +1,64 @@
+!======================================================================
+! Switch1  ->  hostname Clientes
+!======================================================================
+enable
+configure terminal
+!--- 1. Configuracion basica y seguridad
+hostname Clientes
+no ip domain-lookup
+ip domain-name casoestudio.local
+enable secret CLASS
+service password-encryption
+banner motd #Estas conectandote al Switch de Clientes#
+username admin secret CISCO
+line console 0
+ password CISCO
+ login
+ exit
+line vty 0 15
+ password CISCO
+ login local
+ transport input ssh
+ exit
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+!--- 2. VLANs
+vlan 10
+ name Clientes
+ exit
+vlan 20
+ name Administrativo
+ exit
+vlan 30
+ name Finanzas
+ exit
+!--- 3. Interfaces
+interface range FastEthernet0/1 - 10
+ description Puertos VLAN 10 Clientes
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+ exit
+interface range FastEthernet0/21 - 22
+ description EtherChannel Po1 hacia Administrativo
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+ channel-group 1 mode active
+ no shutdown
+ exit
+interface range FastEthernet0/11 - 20, FastEthernet0/23 - 24, GigabitEthernet0/1 - 2
+ shutdown
+ exit
+interface port-channel 1
+ description EtherChannel LACP hacia Administrativo
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+ exit
+interface vlan 10
+ ip address 192.168.10.254 255.255.255.0
+ no shutdown
+ exit
+ip default-gateway 192.168.10.1
+end
+write memory

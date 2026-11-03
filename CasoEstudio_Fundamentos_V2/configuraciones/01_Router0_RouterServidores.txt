@@ -1,0 +1,58 @@
+!======================================================================
+! Router0  ->  hostname RouterServidores
+!======================================================================
+enable
+configure terminal
+!--- 1. Configuracion basica y seguridad
+hostname RouterServidores
+no ip domain-lookup
+ip domain-name casoestudio.local
+enable secret CLASS
+service password-encryption
+banner motd #Estas conectandote al Router de la red de servidores#
+username admin secret CISCO
+line console 0
+ password CISCO
+ login
+ exit
+line vty 0 15
+ password CISCO
+ login local
+ transport input ssh
+ exit
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+!--- 2. Interfaces
+interface GigabitEthernet0/0
+ description LAN Servidores 10.10.10.0/29
+ ip address 10.10.10.1 255.255.255.248
+ no shutdown
+ exit
+interface GigabitEthernet0/1
+ description Enlace IV hacia SwitchMulticapaDistribucion
+ ip address 172.16.0.13 255.255.255.252
+ no shutdown
+ exit
+interface GigabitEthernet0/2
+ description Enlace III hacia RouterRedundancia1
+ ip address 172.16.0.10 255.255.255.252
+ no shutdown
+ exit
+interface GigabitEthernet0/0/0
+ description Enlace V (fibra) hacia RouterRedundancia2
+ ip address 172.16.0.17 255.255.255.252
+ no shutdown
+ exit
+!--- 3. Enrutamiento estatico (principal + flotante AD 10)
+ip route 192.168.10.0 255.255.255.0 172.16.0.14
+ip route 192.168.20.0 255.255.255.0 172.16.0.14
+ip route 192.168.30.0 255.255.255.0 172.16.0.14
+ip route 172.16.99.0 255.255.255.0 172.16.0.18
+ip route 192.168.10.0 255.255.255.0 172.16.0.18 10
+ip route 192.168.20.0 255.255.255.0 172.16.0.18 10
+ip route 192.168.30.0 255.255.255.0 172.16.0.18 10
+ip route 172.16.99.0 255.255.255.0 172.16.0.9 10
+!--- El registro estaba en 0x2142 (ignora la NVRAM al reiniciar). Se restablece:
+config-register 0x2102
+end
+write memory

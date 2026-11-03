@@ -1,0 +1,49 @@
+!======================================================================
+! Switch4  ->  hostname Red-TI
+!======================================================================
+enable
+configure terminal
+!--- 1. Configuracion basica y seguridad
+hostname Red-TI
+no ip domain-lookup
+ip domain-name casoestudio.local
+enable secret CLASS
+service password-encryption
+banner motd #Estas conectandote al Switch de la red de TI#
+username admin secret CISCO
+line console 0
+ password CISCO
+ login
+ exit
+line vty 0 15
+ password CISCO
+ login local
+ transport input ssh
+ exit
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+!--- 2. Interfaces
+interface range FastEthernet0/1 - 10
+ description Puertos Red de TI
+ switchport mode access
+ spanning-tree portfast
+ no shutdown
+ exit
+interface GigabitEthernet0/1
+ description Enlace hacia RouterRedundancia2
+ no shutdown
+ exit
+interface GigabitEthernet0/2
+ description Enlace hacia RouterRedundancia1
+ no shutdown
+ exit
+interface range FastEthernet0/11 - 24
+ shutdown
+ exit
+interface vlan 1
+ ip address 172.16.99.254 255.255.255.0
+ no shutdown
+ exit
+ip default-gateway 172.16.99.1
+end
+write memory

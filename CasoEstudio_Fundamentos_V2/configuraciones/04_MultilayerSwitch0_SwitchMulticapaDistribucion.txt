@@ -1,0 +1,80 @@
+!======================================================================
+! Multilayer Switch0  ->  hostname SwitchMulticapaDistribucion
+!======================================================================
+enable
+configure terminal
+!--- 1. Configuracion basica y seguridad
+hostname SwitchMulticapaDistribucion
+no ip domain-lookup
+ip domain-name casoestudio.local
+enable secret CLASS
+service password-encryption
+banner motd #Estas conectandote al Switch multicapa de distribucion#
+username admin secret CISCO
+line console 0
+ password CISCO
+ login
+ exit
+line vty 0 15
+ password CISCO
+ login local
+ transport input ssh
+ exit
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+!--- 2. VLANs
+vlan 10
+ name Clientes
+ exit
+vlan 20
+ name Administrativo
+ exit
+vlan 30
+ name Finanzas
+ exit
+!--- 3. Interfaces
+ip routing
+interface FastEthernet0/24
+ description Troncal hacia Administrativo
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+ no shutdown
+ exit
+interface GigabitEthernet0/1
+ description Enlace IV hacia RouterServidores
+ no switchport
+ ip address 172.16.0.14 255.255.255.252
+ no shutdown
+ exit
+interface GigabitEthernet0/2
+ description Enlace I hacia RouterRedundancia2
+ no switchport
+ ip address 172.16.0.2 255.255.255.252
+ no shutdown
+ exit
+interface range FastEthernet0/1 - 23
+ shutdown
+ exit
+interface vlan 10
+ ip address 192.168.10.1 255.255.255.0
+ ip helper-address 10.10.10.3
+ no shutdown
+ exit
+interface vlan 20
+ ip address 192.168.20.1 255.255.255.0
+ ip helper-address 10.10.10.3
+ no shutdown
+ exit
+interface vlan 30
+ ip address 192.168.30.1 255.255.255.0
+ ip helper-address 10.10.10.3
+ no shutdown
+ exit
+!--- 4. Enrutamiento estatico (principal + flotante AD 10)
+ip route 10.10.10.0 255.255.255.248 172.16.0.13
+ip route 172.16.99.0 255.255.255.0 172.16.0.1
+ip route 10.10.10.0 255.255.255.248 172.16.0.1 10
+ip route 172.16.99.0 255.255.255.0 172.16.0.13 10
+end
+write memory
